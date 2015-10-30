@@ -31,6 +31,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/todos", getTodos).Methods("GET")
+	r.HandleFunc("/todos", createTodo).Methods("POST")
 	r.HandleFunc("/todos/{id}", getTodo).Methods("GET")
 
 	http.Handle("/", r)
@@ -65,6 +66,29 @@ func getTodo(w http.ResponseWriter, r *http.Request) {
 	// TODO check if one was found, if not, render 404
 
 	w.Header()["Content-Type"] = []string{"application/json"}
+	err = json.NewEncoder(w).Encode(&todo)
+	if err != nil {
+		// TODO: Render 500 error
+		panic(err)
+	}
+}
+
+func createTodo(w http.ResponseWriter, r *http.Request) {
+	var m map[string]string
+	err := json.NewDecoder(r.Body).Decode(&m)
+	if err != nil {
+		// TODO: Render 400 error
+		panic(err)
+	}
+
+	todo := Todo{Description: m["description"], Status: "pending"}
+	if err = db.Create(&todo).Error; err != nil {
+		// TODO: Return 500 or 400
+		panic(err)
+	}
+
+	w.Header()["Content-Type"] = []string{"application/json"}
+	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(&todo)
 	if err != nil {
 		// TODO: Render 500 error
