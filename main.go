@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
+	"net/http"
 	"time"
 )
 
@@ -24,4 +27,25 @@ func main() {
 	}
 
 	db.AutoMigrate(&Todo{})
+
+	r := mux.NewRouter()
+	r.HandleFunc("/todos", getTodos).Methods("GET")
+
+	http.Handle("/", r)
+
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		panic(err)
+	}
+}
+
+func getTodos(w http.ResponseWriter, r *http.Request) {
+	var todos []Todo
+	db.Find(&todos)
+
+	w.Header()["Content-Type"] = []string{"application/json"}
+	err := json.NewEncoder(w).Encode(&todos)
+	if err != nil {
+		// TODO: Render 500 error
+		panic(err)
+	}
 }
