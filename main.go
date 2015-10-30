@@ -46,14 +46,17 @@ func main() {
 	}
 }
 
+// Render 404
 func renderNotFound(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusNotFound)
 }
 
+// Render a given status code
 func renderStatus(w http.ResponseWriter, status int) {
 	w.WriteHeader(status)
 }
 
+// Render an object to JSON with a given status code
 func renderJsonWithStatus(w http.ResponseWriter, status int, objects interface{}) {
 	w.Header()["Content-Type"] = []string{"application/json"}
 	w.WriteHeader(status)
