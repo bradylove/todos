@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -30,6 +31,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/todos", getTodos).Methods("GET")
+	r.HandleFunc("/todos/{id}", getTodo).Methods("GET")
 
 	http.Handle("/", r)
 
@@ -44,6 +46,26 @@ func getTodos(w http.ResponseWriter, r *http.Request) {
 
 	w.Header()["Content-Type"] = []string{"application/json"}
 	err := json.NewEncoder(w).Encode(&todos)
+	if err != nil {
+		// TODO: Render 500 error
+		panic(err)
+	}
+}
+
+func getTodo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		// TODO: Return 404
+		panic(err)
+	}
+
+	var todo Todo
+	db.First(&todo, id)
+	// TODO check if one was found, if not, render 404
+
+	w.Header()["Content-Type"] = []string{"application/json"}
+	err = json.NewEncoder(w).Encode(&todo)
 	if err != nil {
 		// TODO: Render 500 error
 		panic(err)
