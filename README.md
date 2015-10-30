@@ -36,6 +36,6 @@ Accepted parameters are: `description`, `status`. Example:
        "status": "completed"
     }
 
-### Todo#Delete
+### Delete
 
     DELETE /todos/:id
