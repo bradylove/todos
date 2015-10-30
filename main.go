@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,6 +22,7 @@ type Todo struct {
 }
 
 func main() {
+	port := ":8080"
 	var err error
 	db, err = gorm.Open("sqlite3", "todos.db")
 	if err != nil {
@@ -38,7 +40,8 @@ func main() {
 
 	http.Handle("/", r)
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Println("Starting server on port", port)
+	if err := http.ListenAndServe(port, nil); err != nil {
 		panic(err)
 	}
 }
